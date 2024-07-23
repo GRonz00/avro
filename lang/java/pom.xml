@@ -38,59 +38,68 @@
 
     <!-- version properties for dependencies -->
     <ant.version>1.10.14</ant.version>
-    <commons-cli.version>1.8.0</commons-cli.version>
-    <commons-compress.version>1.26.2</commons-compress.version>
-    <commons-text.version>1.12.0</commons-text.version>
-    <commons-lang3.version>3.15.0</commons-lang3.version>
-    <grpc.version>1.65.1</grpc.version>
+    <commons-cli.version>1.6.0</commons-cli.version>
+    <commons-compress.version>1.26.1</commons-compress.version>
+    <commons-text.version>1.11.0</commons-text.version>
+    <commons-lang3.version>3.14.0</commons-lang3.version>
+    <grpc.version>1.62.2</grpc.version>
     <hadoop.version>3.3.6</hadoop.version>
     <hamcrest.version>2.2</hamcrest.version>
-    <jackson-bom.version>2.17.2</jackson-bom.version>
-    <jetty.version>9.4.55.v20240627</jetty.version>
+    <jackson-bom.version>2.16.2</jackson-bom.version>
+    <jetty.version>9.4.54.v20240208</jetty.version>
     <jopt-simple.version>5.0.4</jopt-simple.version>
-    <junit5.version>5.10.3</junit5.version>
+    <junit5.version>5.10.2</junit5.version>
     <maven-core.version>3.9.6</maven-core.version>
-    <mockito.version>5.12.0</mockito.version>
-    <netty.version>4.1.112.Final</netty.version>
-    <protobuf.version>4.27.2</protobuf.version>
+    <mockito.version>5.11.0</mockito.version>
+    <netty.version>4.1.107.Final</netty.version>
+    <protobuf.version>3.25.3</protobuf.version>
     <reload4j.version>1.2.25</reload4j.version>
     <servlet-api.version>4.0.1</servlet-api.version>
-    <slf4j.version>2.0.13</slf4j.version>
+    <slf4j.version>2.0.12</slf4j.version>
     <snappy.version>1.1.10.5</snappy.version>
-    <thrift.version>0.20.0</thrift.version>
+    <thrift.version>0.19.0</thrift.version>
     <tukaani.version>1.9</tukaani.version>
     <velocity.version>2.3</velocity.version>
-    <zstd-jni.version>1.5.6-4</zstd-jni.version>
+    <zstd-jni.version>1.5.5-11</zstd-jni.version>
     <!-- version properties for plugins -->
     <archetype-plugin.version>3.2.1</archetype-plugin.version>
     <bundle-plugin-version>5.1.9</bundle-plugin-version>
-    <cyclonedx-maven-plugin.version>2.8.0</cyclonedx-maven-plugin.version>
-    <exec-plugin.version>3.3.0</exec-plugin.version>
+    <cyclonedx-maven-plugin.version>2.7.11</cyclonedx-maven-plugin.version>
+    <exec-plugin.version>3.2.0</exec-plugin.version>
     <file-management.version>3.1.0</file-management.version>
     <javacc-plugin.version>3.0.3</javacc-plugin.version>
     <javacc.version>7.0.13</javacc.version>
     <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+
+    <!-- JaCoCo integration -->
+    <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+    <sonar.coverage.jacoco.xmlReportPaths>
+      {project.baseDir}/lang/java/jacoco-reports/target/site/jacoco-aggregate/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <modules>
-    <module>android</module>
+    <!--    <module>android</module> -->
     <module>avro</module>
-    <module>idl</module>
-    <module>compiler</module>
-    <module>maven-plugin</module>
-    <module>ipc</module>
-    <module>ipc-jetty</module>
-    <module>ipc-netty</module>
-    <module>trevni</module>
-    <module>tools</module>
-    <module>mapred</module>
-    <module>protobuf</module>
-    <module>thrift</module>
-    <module>archetypes</module>
-    <module>grpc</module>
-    <module>integration-test</module>
-    <module>perf</module>
-    <module>interop-data-test</module>
+    <module>jacoco-reports</module>
+    <!--    <module>idl</module>
+        <module>compiler</module>
+        <module>maven-plugin</module>
+        <module>ipc</module>
+        <module>ipc-jetty</module>
+        <module>ipc-netty</module>
+        <module>trevni</module>
+        <module>tools</module>
+        <module>mapred</module>
+        <module>protobuf</module>
+        <module>thrift</module>
+        <module>archetypes</module>
+        <module>grpc</module>
+        <module>integration-test</module>
+        <module>perf</module>
+        <module>interop-data-test</module>
+    -->
+    <!-- Possibly add here other modules that you may need in order to generate the report with Jacoco -->
   </modules>
 
   <build>
@@ -99,10 +108,11 @@
       parameters if the plugins are used by child projects -->
     <pluginManagement>
       <plugins>
+
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -162,17 +172,18 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-plugin.version}</version>
+          <!--Removed in order to ease the integration with Jacoco -->
+          <!--<version>${maven-surefire-plugin.version}</version>
           <configuration>
             <includes>
-              <!-- Avro naming convention for JUnit tests -->
+              &lt;!&ndash; Avro naming convention for JUnit tests &ndash;&gt;
               <include>**/Test**</include>
             </includes>
             <excludes>
-              <!-- A few inner classes are not to be tested -->
+              &lt;!&ndash; A few inner classes are not to be tested &ndash;&gt;
               <exclude>**/*$*</exclude>
-              <!-- exclude the generated classes under apache.avro.test, some of
-                these match **/Test** and are not JUnit tests -->
+              &lt;!&ndash; exclude the generated classes under apache.avro.test, some of
+                these match **/Test** and are not JUnit tests &ndash;&gt;
               <exclude>**/apache/avro/test/**</exclude>
             </excludes>
             <enableAssertions>false</enableAssertions>
@@ -180,26 +191,27 @@
             <runOrder>random</runOrder>
             <parallel>all</parallel>
             <useUnlimitedThreads>true</useUnlimitedThreads>
-            <!--<perCoreThreadCount>true</perCoreThreadCount>-->
+            &lt;!&ndash;<perCoreThreadCount>true</perCoreThreadCount>&ndash;&gt;
 
-            <!-- TestSpecificCompiler instantiates a Java compiler to test output results,
+            &lt;!&ndash; TestSpecificCompiler instantiates a Java compiler to test output results,
                  this does not work with a manifest-only-jar to set the classpath for the javac.
                  This may cause problems on some platforms.
                  See https://maven.apache.org/plugins/maven-surefire-plugin/examples/class-loading.html
-                 for more information. -->
+                 for more information. &ndash;&gt;
             <useManifestOnlyJar>false</useManifestOnlyJar>
-            <!-- configures unit test standard error and standard out to go to a file per test
-                 rather than the console. -->
+            &lt;!&ndash; configures unit test standard error and standard out to go to a file per test
+                 rather than the console. &ndash;&gt;
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <failIfNoTests>false</failIfNoTests>
             <argLine>-Xmx1000m</argLine>
-          </configuration>
+          </configuration>-->
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <links>
+              <link>https://docs.oracle.com/javase/8/docs/api/</link>
               <link>https://hadoop.apache.org/docs/current/api/</link>
             </links>
             <tagletArtifacts>
@@ -310,12 +322,13 @@
         <artifactId>spotless-maven-plugin</artifactId>
         <configuration>
           <java>
-            <eclipse>
-              <!-- Avro uses Sun's java code style conventions with 2 spaces, this is a modified version of
-                   the eclipse formatter -->
+            <!-- Removed in order to ease the build, these steps are not necessary within the our ISW2 course -->
+            <!--<eclipse>
+              &lt;!&ndash; Avro uses Sun's java code style conventions with 2 spaces, this is a modified version of
+                   the eclipse formatter &ndash;&gt;
               <file>${main.basedir}/lang/java/eclipse-java-formatter.xml</file>
               <version>4.19</version>
-            </eclipse>
+            </eclipse>-->
             <!-- Temporarily disabled for JDK 16+ builds -->
             <!--<removeUnusedImports/>-->
             <replaceRegex>
@@ -497,6 +510,33 @@
       <properties>
         <hadoop.version>2.10.1</hadoop.version>
       </properties>
+    </profile>
+
+
+    <!-- JaCoCo Profile -->
+    <profile>
+      <id>jacoco</id>
+      <activation>
+        <property>
+          <name>jacoco</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
