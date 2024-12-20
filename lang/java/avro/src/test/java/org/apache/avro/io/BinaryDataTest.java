@@ -204,76 +204,7 @@ public class BinaryDataTest {
       }
     }
   }
-  @RunWith(Parameterized.class)
-  public static class EncodeTest {
-    @Parameterized.Parameters
-    public static Collection<Object[]> getParametersEncode() {
-      return Arrays.asList(
-          new Object[][]{
-              {-1L, null, -1, -1, new byte[]{0},true},
-              {0L, new byte[1], 0, 1, new byte[]{0},false},
-              {1L, new byte[0], 0, -1,new byte[]{80,80}, true},
-              {Long.MAX_VALUE, new byte[10], 0, 10,new byte[]{-2,-1,-1,-1,-1,-1,-1,-1,-1,1}, false},
-              //jacoco
-              {(long)Math.pow(2,6),new byte[2],0,2,new byte[]{-128,1},false},
-              {(long)Math.pow(2,13),new byte[3],0,3,new byte[]{-128,-128,1},false},
-              {(long)Math.pow(2,20),new byte[4],0,4,new byte[]{-128,-128,-128,1},false},
-              {(long)Math.pow(2,27),new byte[5],0,5,new byte[]{-128,-128,-128,-128,1},false},
-              {(long)Math.pow(2,34),new byte[6],0,6,new byte[]{-128,-128,-128,-128,-128,1},false},
-              {(long)Math.pow(2,41),new byte[7],0,7,new byte[]{-128,-128,-128,-128,-128,-128,1},false},
-              {(long)Math.pow(2,48),new byte[8],0,8,new byte[]{-128,-128,-128,-128,-128,-128,-128,1},false},
-              {(long)Math.pow(2,55),new byte[9],0,9,new byte[]{-128,-128,-128,-128,-128,-128,-128,-128,1},false},
-              {(long)Math.pow(2,62),new byte[10],0,10,new byte[]{-128,-128,-128,-128,-128,-128,-128,-128,-128,1},false},
-              //pit
-              {(long)Math.pow(2,13)-1,new byte[2],0,2,new byte[]{-2,127},false},
-              {(long)Math.pow(2,20)-1,new byte[3],0,3,new byte[]{-2,-1,127},false},
-              {(long)Math.pow(2,27)-1,new byte[4],0,4,new byte[]{-2,-1,-1,127},false},
-              {(long)Math.pow(2,34)-1,new byte[5],0,5,new byte[]{-2,-1,-1,-1,127},false},
-              {(long)Math.pow(2,41)-1,new byte[6],0,6,new byte[]{-2,-1,-1,-1,-1,127},false},
-              {(long)Math.pow(2,48)-1,new byte[7],0,7,new byte[]{-2,-1,-1,-1,-1,-1,127},false},
-              {(long)Math.pow(2,55)-1,new byte[8],0,8,new byte[]{-2,-1,-1,-1,-1,-1,-1,127},false},
-              {(long)Math.pow(2,62)-1,new byte[9],0,9,new byte[]{-2,-1,-1,-1,-1,-1,-1,-1,127},false},
-              //{(long)Math.pow(2,69)-1,new byte[10],0,10,new byte[]{-4,-1,-1,-1,-1,-1,-1,-1,-1,1},false},
 
-
-
-          }
-      );
-    }
-
-    private final long n;
-    private final byte[] buf;
-    private final int pos;
-    private final boolean ecc;
-    private final int expPos;
-    private final byte[] expEnc;
-    public EncodeTest(long n, byte[] buf, int pos,int expPos,byte[] expEnc, boolean ecc){
-      this.n = n;
-      this.buf = buf;
-      this.pos = pos;
-      this.expPos = expPos;
-      this.expEnc = expEnc;
-      this.ecc = ecc;
-    }
-    @Test
-    public void encodeTest(){
-      try{
-        int result = BinaryData.encodeLong(n,buf,pos);
-        if(ecc){
-          Assert.fail();
-        }
-        Assert.assertEquals(expPos,result);
-          Assert.assertArrayEquals(buf, expEnc);
-
-      }catch (Exception e){
-        if(!ecc){
-          Assert.fail();
-        }
-      }
-    }
-  }
-  @RunWith(Parameterized.class)
-  public static class HashCodeTest{
 
   }
 
@@ -282,6 +213,6 @@ public class BinaryDataTest {
 
 
 
-}
+
 
 

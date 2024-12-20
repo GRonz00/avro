@@ -74,6 +74,7 @@ public class GenericDataTest {
               {mapSchema1, mapData2, true, false},
               {fixedSchema1, 3, false, false},
               {fixedSchema1, new GenericData.Fixed(fixedSchema1, new byte[8]), false, false},
+              //due missed badua per enum default
               // PIT Improvements
               {enumSchema1, new GenericData.EnumSymbol(enumSchema1, "c"), false, false},
               {Schema.create(Schema.Type.STRING), "Test", true, false},
@@ -102,7 +103,7 @@ public class GenericDataTest {
       try {
         boolean result = GenericData.get().validate(schema, datum);
         Assert.assertEquals(expected, result);
-/*
+
         // PIT improvements
         if (schema.getType() == Schema.Type.ENUM && datum instanceof GenericData.EnumSymbol) {
           GenericData.EnumSymbol enumSymbol = (GenericData.EnumSymbol) datum;
@@ -115,7 +116,7 @@ public class GenericDataTest {
           }
         }
 
- */
+
 
 
       } catch (Exception ignored) {
@@ -123,81 +124,90 @@ public class GenericDataTest {
       }
     }
   }
-/*
+
   @RunWith(Parameterized.class)
   public static class TestInduce {
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters() {
-      Schema recordSchema1 = Schema.createRecord(null, null, null, false, Collections.emptyList());
-      GenericData.Record record1 = new GenericRecordBuilder(recordSchema1).build();
+      Schema recordSchema = Schema.createRecord(null, null, null, false, Collections.emptyList());
+      GenericData.Record record = new GenericRecordBuilder(recordSchema).build();
 
-      Schema enumSchema1 = Schema.createEnum(null, null, null, Arrays.asList("a", "b"));
-      GenericData.EnumSymbol enum1 = new GenericData.EnumSymbol(enumSchema1, "a");
+      //Schema enumSchema = Schema.createEnum(null, null, null, Arrays.asList("1", "2"));
+      //GenericData.EnumSymbol enumSymbol = new GenericData.EnumSymbol(enumSchema, "1");
 
-      Schema arraySchema1 = Schema.createArray(Schema.create(Schema.Type.INT));
-      GenericData.Array<Integer> array1 = new GenericData.Array<>(16, arraySchema1);
-      array1.add(0, 3);
+      Schema arraySchema = Schema.createArray(Schema.create(Schema.Type.INT));
+      GenericData.Array<Integer> array = new GenericData.Array<>(16, arraySchema);
+      array.add(0, 1);
 
       Schema mapSchema1 = Schema.createMap(Schema.create(Schema.Type.STRING));
       Map<String, String> map1 = new HashMap<>();
-      map1.put("key", "value");
+      map1.put("key", "v");
 
       Schema fixedSchema1 = Schema.createFixed(null, null, null, 16);
       GenericData.Fixed fixed1 = new GenericData.Fixed(fixedSchema1);
 
       Map<String, String> map2 = new HashMap<>();
-      map2.put("key1", "value1");
+      map2.put("key1", "v1");
       map2.put("key2", null);
 
       Map<String, String> map3 = new HashMap<>();
-      map3.put("key1", "value1");
-      map3.put("key2", "value2");
+      map3.put("key1", "v1");
+      map3.put("key2", "v2");
 
-      ExpectedResult<Schema> exception = new ExpectedResult<>(null, Exception.class);
       return Arrays.asList(new Object[][]{
-          {new GenericData(), exception},
-          {null, new ExpectedResult<>(Schema.create(Schema.Type.NULL), null)},
-          {"generic", new ExpectedResult<>(Schema.create(Schema.Type.STRING), null)},
-          {ByteBuffer.allocate(3), new ExpectedResult<>(Schema.create(Schema.Type.BYTES), null)},
-          {3, new ExpectedResult<>(Schema.create(Schema.Type.INT), null)},
-          {3L, new ExpectedResult<>(Schema.create(Schema.Type.LONG), null)},
-          {3.14f, new ExpectedResult<>(Schema.create(Schema.Type.FLOAT), null)},
-          {3.14, new ExpectedResult<>(Schema.create(Schema.Type.DOUBLE), null)},
-          {true, new ExpectedResult<>(Schema.create(Schema.Type.BOOLEAN), null)},
-          {record1, new ExpectedResult<>(recordSchema1, null)},
-//        {enum1, new ExpectedResult<>(enumSchema1, null)}, // Fail: induce does not support EnumSchema
-          {array1, new ExpectedResult<>(arraySchema1, null)},
-          {map1, new ExpectedResult<>(mapSchema1, null)},
-          {fixed1, new ExpectedResult<>(fixedSchema1, null)},
+          {new GenericData(), Schema.create(Schema.Type.NULL), true},
+          {null, Schema.create(Schema.Type.NULL),false},
+          {"string", Schema.create(Schema.Type.STRING),false},
+          {ByteBuffer.allocate(3), Schema.create(Schema.Type.BYTES), false},
+          {1, Schema.create(Schema.Type.INT), false},
+          {1L, Schema.create(Schema.Type.LONG), false},
+          {1.1f, Schema.create(Schema.Type.FLOAT), false},
+          {1.1, Schema.create(Schema.Type.DOUBLE), false},
+          {true, Schema.create(Schema.Type.BOOLEAN), false},
+          {record, recordSchema, false},
+//        {enum1, enumSchema1, false}, // Fail: induce does not support EnumSchema
+          {array, arraySchema, false},
+          {map1, mapSchema1, false},
+          {fixed1, fixedSchema1, false},
           // Improvements
-          {Arrays.asList(3, null), exception},
-          {Arrays.asList(3, 4), new ExpectedResult<>(arraySchema1, null)},
-          {Collections.emptyList(), exception},
-          {map2, exception},
-          {map3, new ExpectedResult<>(mapSchema1, null)},
-          {new HashMap<>(), exception},
+          {Arrays.asList(1, null), null,true},
+          {Arrays.asList(1, 2), arraySchema, false},
+          {Collections.emptyList(), null,true},
+          {map2, null,true},
+          {map3, mapSchema1, false},
+          {new HashMap<>(), null,true},
+
       });
     }
 
     private final Object datum;
-    private final ExpectedResult<Schema> expected;
+    private final Schema expected;
+    private final boolean exception;
 
-    public TestInduce(Object datum, ExpectedResult<Schema> expected) {
+    public TestInduce(Object datum, Schema expected, boolean exception) {
       this.datum = datum;
       this.expected = expected;
+      this.exception = exception;
     }
 
     @Test
     public void induceTest() {
       try {
         Schema result = GenericData.get().induce(datum);
-        Assert.assertEquals(expected.getResult(), result);
-      } catch (Exception ignored) {
-        Assert.assertNotNull(expected.getException());
+        if(!exception){
+          Assert.assertEquals(expected, result);
+        }else {
+          Assert.fail();
+        }
+
+      } catch (Exception e) {
+        if(!exception){
+          Assert.fail();
+        }
       }
     }
   }
-
+/*
   @RunWith(Parameterized.class)
   public static class TestResolveUnion {
     @Parameterized.Parameters
@@ -209,9 +219,9 @@ public class GenericDataTest {
       Schema unionSchema3 = Schema.createUnion(intDate, stringUuid);
       Schema unionSchema4 = Schema.createUnion();
       Schema unionSchema5 = Schema.createUnion(stringUuid);
-      ExpectedResult<Integer> zero = new ExpectedResult<>(0, null);
-      ExpectedResult<Integer> one = new ExpectedResult<>(1, null);
-      ExpectedResult<Integer> exception = new ExpectedResult<>(null, Exception.class);
+      ExpectedResult<Integer> zero = 0, null);
+      ExpectedResult<Integer> one = 1, null);
+      ExpectedResult<Integer> exception = null, Exception.class);
       return Arrays.asList(new Object[][]{
           {null, null, exception},
           {Schema.create(Schema.Type.STRING), 3.14f, exception},
@@ -280,10 +290,10 @@ public class GenericDataTest {
       GenericData.Record record3 = new GenericRecordBuilder(recordSchema).set("a", 0).set("b", 3.14f).build();
       GenericData.Record record4 = new GenericRecordBuilder(recordSchema2).build();
       GenericData.Record record5 = new GenericRecordBuilder(recordSchema2).set("a", 3).build();
-      ExpectedResult<Integer> zero = new ExpectedResult<>(0, null);
-      ExpectedResult<Integer> minus1 = new ExpectedResult<>(-1, null);
-      ExpectedResult<Integer> one = new ExpectedResult<>(1, null);
-      ExpectedResult<Integer> exception = new ExpectedResult<>(null, Exception.class);
+      ExpectedResult<Integer> zero = 0, null);
+      ExpectedResult<Integer> minus1 = -1, null);
+      ExpectedResult<Integer> one = 1, null);
+      ExpectedResult<Integer> exception = null, Exception.class);
       return Arrays.asList(new Object[][]{
 //        {null, null, null, true, exception}, // Fail: shouldn't work with invalid schema
 //        {"generic", 3, Schema.create(Schema.Type.NULL), false, exception}, // Fail: objects are incompatible with schema
