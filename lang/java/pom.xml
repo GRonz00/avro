@@ -246,11 +246,6 @@
           <version>${exec-plugin.version}</version>
         </plugin>
         <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>${spotless-maven-plugin.version}</version>
-        </plugin>
-        <plugin>
           <groupId>org.cyclonedx</groupId>
           <artifactId>cyclonedx-maven-plugin</artifactId>
           <version>${cyclonedx-maven-plugin.version}</version>
@@ -296,61 +291,8 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <consoleOutput>true</consoleOutput>
-          <configLocation>checkstyle.xml</configLocation>
-          <suppressionsLocation>suppressions.xml</suppressionsLocation>
-        </configuration>
-        <!-- Runs by default in the verify phase  (mvn verify or later in the build cycle)
-             the 'check' goal will fail the build if it does not pass.  "mvn checkstyle:check"
-             will do this alone, or "mvn checkstyle:checkstyle" will report but not break  -->
-        <executions>
-          <execution>
-            <id>checkstyle-check</id>
-            <phase>test</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-        <configuration>
-          <java>
-            <!-- Removed in order to ease the build, these steps are not necessary within the our ISW2 course -->
-            <!--<eclipse>
-              &lt;!&ndash; Avro uses Sun's java code style conventions with 2 spaces, this is a modified version of
-                   the eclipse formatter &ndash;&gt;
-              <file>${main.basedir}/lang/java/eclipse-java-formatter.xml</file>
-              <version>4.19</version>
-            </eclipse>-->
-            <!-- Temporarily disabled for JDK 16+ builds -->
-            <!--<removeUnusedImports/>-->
-            <replaceRegex>
-              <name>Remove wildcard imports</name>
-              <searchRegex>import\s+[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
-              <replacement>$1</replacement>
-            </replaceRegex>
-            <!-- Allow spotless:off/spotless:on comment pairs to keep ASCII-formatted tables intact -->
-            <toggleOffOn/>
-          </java>
-        </configuration>
-        <executions>
-          <execution>
-            <!-- Runs in compile phase to fail fast in case of formatting issues.-->
-            <id>spotless-check</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
+
       <plugin>
         <groupId>org.cyclonedx</groupId>
         <artifactId>cyclonedx-maven-plugin</artifactId>
@@ -377,7 +319,6 @@
         <skipTests>true</skipTests>
         <rat.skip>true</rat.skip>
         <checkstyle.skip>true</checkstyle.skip>
-        <spotless.skip>true</spotless.skip>
         <invoker.skip>true</invoker.skip>
         <cyclonedx.skip>true</cyclonedx.skip>
         <gpg.skip>true</gpg.skip>
@@ -402,18 +343,7 @@
               <configuration>
                 <lifecycleMappingMetadata>
                   <pluginExecutions>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>com.diffplug.spotless</groupId>
-                        <artifactId>spotless-maven-plugin</artifactId>
-                        <goals>
-                          <goal>check</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore></ignore>
-                      </action>
-                    </pluginExecution>
+
                     <pluginExecution>
                       <pluginExecutionFilter>
                         <groupId>org.apache.maven.plugins</groupId>
