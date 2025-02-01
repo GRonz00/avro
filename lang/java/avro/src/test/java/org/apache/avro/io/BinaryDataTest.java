@@ -2,21 +2,22 @@ package org.apache.avro.io;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
+
 @RunWith(Enclosed.class)
 public class BinaryDataTest {
+
   @RunWith(Parameterized.class)
   public static class CompareTest {
     @Parameterized.Parameters
@@ -41,11 +42,12 @@ public class BinaryDataTest {
       }
       GenericData.Fixed fixedValue = new GenericData.Fixed(fixedSchema1, fixedData);
       GenericData.Fixed fixedValue2 = new GenericData.Fixed(fixedSchema1, fixedData2);
-      byte[] b_string = Utils.encodeString(Schema.create(Schema.Type.STRING), "test");
-      byte[] b_string2 = Utils.encodeString(Schema.create(Schema.Type.STRING), "prova");
-      byte[] b_float = Utils.encode_float(new ArrayList<>(Arrays.asList(3.14f, 2.15f, 6.13f)));
-      byte[] b_float2 = Utils.encode_float(new ArrayList<>(Arrays.asList(4.14f, 2.15f, 6.13f, 33.0f)));
+      byte[] b_string = Utils.encodeString(Schema.create(Schema.Type.STRING), "a");
+      byte[] b_string2 = Utils.encodeString(Schema.create(Schema.Type.STRING), "ba");
+      byte[] b_float = Utils.encode_float(new ArrayList<>(Arrays.asList(1.1f, 2.2f)));
+      byte[] b_float2 = Utils.encode_float(new ArrayList<>(Arrays.asList(3.3f, 2.2f, 4.4f)));
       byte[] b_int = Utils.encode_int(new ArrayList<>(Arrays.asList(1, 2, 3)));
+      byte[] b_int2 = Utils.encode_int(new ArrayList<>(Arrays.asList(3, 4, 5, 6)));
       byte[] b_long = Utils.encode_long(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
       byte[] b_long2 = Utils.encode_long(new ArrayList<>(Arrays.asList(2L, 2L, 3L, 4L)));
       byte[] b_double = Utils.encode_double(new ArrayList<>(Arrays.asList(1d, 2d, 3d)));
@@ -113,21 +115,22 @@ public class BinaryDataTest {
       return Arrays.asList(
           new Object[][]{
 
-              //{null,null,-1,-1,null,-1,-1,-1,true},
+              //{null,null,-1,-1,null,-1,-1,-2,true},
               {Schema.create(Schema.Type.NULL), new byte[1], 0, 0, new byte[1], 0, 0, 0, false},
+              {Schema.create(Schema.Type.STRING), b_string, b_string.length, 1 , b_string2, b_string2.length, 1, -2, true},
+              {Schema.create(Schema.Type.BYTES), b_int2, -1, -1, b_int, -1, -1, -2, true},
+              {Schema.create(Schema.Type.INT), b_int,0,b_int.length,b_int,0,b_int.length,0,false},
+              {Schema.create(Schema.Type.LONG),b_string,b_string.length,1,b_string2,b_string2.length,1,-2,true},
+              {Schema.create(Schema.Type.FLOAT),b_float2, -1, -1, b_float,-1,-1,-2,true},
+              {Schema.create(Schema.Type.DOUBLE),b_string,0,b_string.length,b_string,0,b_string.length,-2,true},
+              {recordSchema1,b_record,b_record.length,1,b_record,b_record.length,1,-2,true},
+              {enumSchema1,b_string2,-1,-1,b_string,-1,-1,-2,true},
+              {arraySchema1, b_array,0,b_array.length,b_array,0,b_array.length,0,false},
+              {mapSchema1, b_string,b_string.length,1,b_string2,b_string2.length,1,-2,true},
+              {unionSchema1,b_union,-1,-1,b_union,-1,-1,-2,true},
+              {fixedSchema1,b_string,0,b_string.length,b_string,0,b_string.length,-2,true},
+              {Schema.create(Schema.Type.BOOLEAN), b_boolean,b_boolean.length,1,b_boolean2,b_boolean2.length,1,-2,true},
 
-              {Schema.create(Schema.Type.STRING), b_string, b_string.length, 1, b_string, b_string.length, 1, -1, true},
-              {Schema.create(Schema.Type.BYTES), b_string, -1, b_string.length, b_string2, -1, b_string2.length, -1, true},
-              {Schema.create(Schema.Type.INT), null, 0, -1, b_string, 0, -1, -1, true},
-              {Schema.create(Schema.Type.LONG), new byte[1], 1, 0, null, 1, 0, -1, true},
-              {Schema.create(Schema.Type.FLOAT), b_float, -1, 1, new byte[1], -1, 1, -1, true},
-              {Schema.create(Schema.Type.DOUBLE), b_string, 0, b_string.length, b_string, 0, b_string.length, -1, true},
-              {Schema.create(Schema.Type.BOOLEAN), null, 0, -1, null, 0, -1, -1, true},
-              {recordSchema1, new byte[1], -1, 0, b_record, -1, 0, -1, true},
-              {enumSchema1, b_enum, 0, 1, null, 0, 1, -1, true},
-              {arraySchema1, b_string, b_string.length, b_string.length, new byte[1], 0, 0, -1, true},
-              {mapSchema1, null, -1, -1, null, -1, -1, -1, true},
-              {unionSchema1, new byte[1], 0, 0, b_union, 0, 0, -1, true},
 
               //jacoco improvement
               //uguali
@@ -163,6 +166,8 @@ public class BinaryDataTest {
               {schemaIgnOrd3, b5, 0, b5.length, b5, 0, b5.length, 0, false},
               {fixedSchema1, b_fixed, 0, b_fixed.length, b_fixed2, 0, b_fixed2.length, 1, false},
               {fixedSchema1, b_fixed, 0, b_fixed.length, b_fixed2, 0, b_fixed2.length, 1, false},
+
+
 
               //<du var="schema" def="86" use="88" target="175" covered="0"/> e <du var="$SwitchMap$org$apache$avro$Schema$Type" def="86" use="88" target="175" covered="0"/> è una enum non posso provare il caso non trovato
               //<du var="i" def="115" use="138" target="146" covered="0"/> impossibile coprire si dovrebbe avere l = 0 ma se l1 o l2 è uguale a zero il metodo ritorna prima
@@ -204,6 +209,72 @@ public class BinaryDataTest {
       }
     }
   }
+
+
+
+  @RunWith(Parameterized.class)
+  public static class TestEncodeInt{
+    @Parameterized.Parameters
+    public static Collection<Object[]> getParameters() {
+      byte[] b_byte = Utils.encode_int(new ArrayList<>(Arrays.asList(1, 2, 3)));
+      return Arrays.asList(new Object[][]{
+          {MIN_VALUE,null,-1,-1,true},
+          {-1,new byte[5],4,1,false},
+          {0,b_byte,b_byte.length,1,true},
+          {1,null,-1,-1,true},
+          {MAX_VALUE,new byte[5],0,5,false},
+
+          //jacoco
+          {0,new byte[5],0,1,false},
+          {64,new byte[5],0,2,false},
+          {8192,new byte[5],0,3,false},
+          {1048576,new byte[5],0,4,false},
+          //pit
+          {63,new byte[5],0,1,false},
+          {8191,new byte[5],0,2,false},
+          {1048575,new byte[5],0,3,false},
+          {134217727,new byte[5],0,4,false},
+          {134217728,new byte[5],0,5,false},
+
+
+
+
+      });
+    }
+    private final int n;
+    private final byte[] buf;
+    private final int pos;
+    private final int expected;
+    private final boolean expectedException;
+    public TestEncodeInt(int n, byte[] buf, int pos, int expected, boolean expectedException){
+      this.n = n;
+      this.buf = buf;
+      this.pos = pos;
+      this.expected = expected;
+      this.expectedException = expectedException;
+    }
+    @Test
+    public void encodeIntTest() {
+      try {
+        int result = BinaryData.encodeInt(n,buf,pos);
+        if(expectedException){
+          Assert.fail();
+        }
+        Assert.assertEquals(expected,result);
+        BinaryDecoder bd = new BinaryDecoder();
+        bd.setBuf(buf,pos,buf.length);
+        Assert.assertEquals(n,bd.readInt());
+
+      } catch (Exception e) {
+        if(!expectedException){
+          Assert.fail();
+        }
+      }
+    }
+
+  }
+
+
 
 
   }
