@@ -14,10 +14,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 11
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 21
           distribution: 'temurin' # Alternative distribution options are available.
       - name: Cache Maven packages
         uses: actions/cache@v3
@@ -29,7 +29,7 @@ jobs:
         run: |
           git clone https://github.com/saeg/ba-dua
           cd ba-dua
-          git checkout tags/ba-dua-0.6.0 -b ba-dua-0.6.0
+          git checkout tags/ba-dua-0.8.0 -b ba-dua-0.8.0
           mvn clean install
           cd ..
       - name: Build and Generate ba-dua Report
