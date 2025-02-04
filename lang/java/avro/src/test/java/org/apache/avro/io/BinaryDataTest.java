@@ -103,7 +103,6 @@ public class BinaryDataTest {
         b_array1 = Utils.encodeArray(Arrays.asList(1, 2, 3, 4), arraySchema1);
         b_array3 = Utils.encodeArray(Arrays.asList(7, 8, 9), arraySchema1);
         b_array2 = new byte[]{3, 7, 5, 0};
-        b_array5 = new byte[]{};
         b_union = Utils.encodeUnion("test", unionSchema1);
         b_union2 = Utils.encodeUnion(2, unionSchema1);
         b_fixed2 = Utils.encodeFixed(fixedValue2, fixedSchema1);
@@ -144,7 +143,6 @@ public class BinaryDataTest {
               {enumSchema1, b_enum, 0, b_enum.length, b_enum, 0, b_enum.length, 0, false},
               {arraySchema1, b_array, 0, b_array.length, b_array, 0, b_array.length, 0, false},
               {unionSchema1, b_union, 0, b_union.length, b_union, 0, b_union.length, 0, false},
-
               {schemaIgnOrd, b1, 0, b1.length, b1, 0, b1.length, 0, false},
               {fixedSchema1, b_fixed, 0, b_fixed.length, b_fixed, 0, b_fixed.length, 0, false},
               //diversi
@@ -164,7 +162,6 @@ public class BinaryDataTest {
               {Schema.create(Schema.Type.DOUBLE), b_double, 0, b_double.length, b_double2, 0, b_double2.length, -1, false},
               {Schema.create(Schema.Type.BOOLEAN), b_boolean, 0, b_boolean.length, b_boolean2, 0, b_boolean2.length, -1, false},
               {schemaIgnOrd3, b5, 0, b5.length, b5, 0, b5.length, 0, false},
-              {fixedSchema1, b_fixed, 0, b_fixed.length, b_fixed2, 0, b_fixed2.length, 1, false},
               {fixedSchema1, b_fixed, 0, b_fixed.length, b_fixed2, 0, b_fixed2.length, 1, false},
 
 

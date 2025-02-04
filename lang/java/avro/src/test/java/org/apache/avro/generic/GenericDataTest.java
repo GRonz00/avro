@@ -244,15 +244,14 @@ public class GenericDataTest {
           {Schema.create(Schema.Type.LONG), 1L, -1,true},
           {unionSchema, 1, 0, false},
           {null, "value", -1,true},
-
-          // JaCoCo
+          // Jacoco
           {unionSchema, new UUID(1, 1), -1,true},
           {unionSchema2, new UUID(1, 1), 1,false},
           {unionSchema3, new UUID(1, 1), 1,false},
-          // ba-dua
+          // badua
           {unionSchema4, new UUID(1, 1), -1,true},
           {unionSchema5, new UUID(1, 1), 0,false},
-          // PIT
+          // Pit
           {unionSchema, "value", 1,false},
 
 
